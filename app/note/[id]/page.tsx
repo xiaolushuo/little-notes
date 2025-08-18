@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Edit, Trash2, Share, Heart } from "lucide-react"
+import { ArrowLeft, Edit, Trash2, Share, Heart, Pin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
@@ -9,40 +9,7 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { useBackground } from "@/hooks/use-background"
 
-// 模拟笔记数据
-const sampleNotes = [
-  {
-    id: "1",
-    content: "今天天气很好，适合出去走走。记得带上相机拍些美丽的风景。",
-    tags: ["生活", "摄影"],
-    createdAt: new Date("2024-01-15"),
-    image: "/beautiful-landscape.png",
-  },
-  {
-    id: "2",
-    content: "学习新的编程技术，今天完成了React组件的开发。#编程 #学习",
-    tags: ["编程", "学习", "工作"],
-    createdAt: new Date("2024-01-14"),
-  },
-  {
-    id: "3",
-    content: "晚餐做了红烧肉，味道不错。下次可以试试加点八角。",
-    tags: ["美食", "烹饪"],
-    createdAt: new Date("2024-01-13"),
-  },
-  {
-    id: "4",
-    content: "今天去了新开的咖啡店，环境很棒，适合工作。#咖啡 #工作",
-    tags: ["咖啡", "工作", "生活"],
-    createdAt: new Date("2024-01-12"),
-  },
-  {
-    id: "5",
-    content: "完成了这周的学习计划，掌握了新的设计技巧。",
-    tags: ["学习", "设计"],
-    createdAt: new Date("2024-01-11"),
-  },
-]
+import { getNotes, deleteNote, togglePinNote } from "@/lib/storage"
 
 export default function NoteDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { noteBackground } = useBackground()
@@ -61,14 +28,37 @@ export default function NoteDetailPage({ params }: { params: Promise<{ id: strin
 
   useEffect(() => {
     if (id) {
-      // 根据ID查找笔记
-      const foundNote = sampleNotes.find((n) => n.id === id)
+      // 从本地存储中查找笔记
+      const notes = getNotes()
+      const foundNote = notes.find((n) => n.id === id)
       setNote(foundNote)
     }
   }, [id])
 
   const handleEdit = () => {
     router.push(`/note/${id}/edit`)
+  }
+
+  const handleDelete = () => {
+    if (confirm("确定要删除这条笔记吗？")) {
+      try {
+        deleteNote(id)
+        router.push("/")
+      } catch (error) {
+        console.error("Error deleting note:", error)
+      }
+    }
+  }
+
+  const handleTogglePin = async () => {
+    try {
+      const updatedNote = togglePinNote(id)
+      if (updatedNote) {
+        setNote(updatedNote)
+      }
+    } catch (error) {
+      console.error("Error toggling pin:", error)
+    }
   }
 
   if (!note) {
@@ -115,6 +105,14 @@ export default function NoteDetailPage({ params }: { params: Promise<{ id: strin
               <Button
                 variant="ghost"
                 size="sm"
+                onClick={handleTogglePin}
+                className="text-white hover:bg-white/20"
+              >
+                <Pin className={`h-4 w-4 ${note.isPinned ? "fill-current" : ""}`} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setIsLiked(!isLiked)}
                 className="text-white hover:bg-white/20"
               >
@@ -126,7 +124,7 @@ export default function NoteDetailPage({ params }: { params: Promise<{ id: strin
               <Button variant="ghost" size="sm" onClick={handleEdit} className="text-white hover:bg-white/20">
                 <Edit className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+              <Button variant="ghost" size="sm" onClick={handleDelete} className="text-white hover:bg-white/20">
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -134,9 +132,19 @@ export default function NoteDetailPage({ params }: { params: Promise<{ id: strin
         </header>
 
         {/* Content */}
-        <main className="px-4 py-6">
+        <main className="px-4 py-6 pb-40">
           <div className="max-w-md mx-auto">
             <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
+              {/* 置顶标识 */}
+              {note.isPinned && (
+                <div className="mb-4 flex items-center">
+                  <div className="bg-gradient-to-r from-amber-400 to-orange-400 text-white text-xs px-2 py-1 rounded-full flex items-center space-x-1 shadow-lg">
+                    <Pin className="h-3 w-3" />
+                    <span>置顶</span>
+                  </div>
+                </div>
+              )}
+
               {/* Image */}
               {note.image && (
                 <div className="mb-4 rounded-xl overflow-hidden">

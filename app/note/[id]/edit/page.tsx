@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Camera, ImageIcon, Save } from "lucide-react"
+import { ArrowLeft, Camera, ImageIcon, Save, Pin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
@@ -9,40 +9,7 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { useBackground } from "@/hooks/use-background"
 
-// 模拟笔记数据
-const sampleNotes = [
-  {
-    id: "1",
-    content: "今天天气很好，适合出去走走。记得带上相机拍些美丽的风景。",
-    tags: ["生活", "摄影"],
-    createdAt: new Date("2024-01-15"),
-    image: "/beautiful-landscape.png",
-  },
-  {
-    id: "2",
-    content: "学习新的编程技术，今天完成了React组件的开发。#编程 #学习",
-    tags: ["编程", "学习", "工作"],
-    createdAt: new Date("2024-01-14"),
-  },
-  {
-    id: "3",
-    content: "晚餐做了红烧肉，味道不错。下次可以试试加点八角。",
-    tags: ["美食", "烹饪"],
-    createdAt: new Date("2024-01-13"),
-  },
-  {
-    id: "4",
-    content: "今天去了新开的咖啡店，环境很棒，适合工作。#咖啡 #工作",
-    tags: ["咖啡", "工作", "生活"],
-    createdAt: new Date("2024-01-12"),
-  },
-  {
-    id: "5",
-    content: "完成了这周的学习计划，掌握了新的设计技巧。",
-    tags: ["学习", "设计"],
-    createdAt: new Date("2024-01-11"),
-  },
-]
+import { getNotes, updateNote, togglePinNote } from "@/lib/storage"
 
 const builtInTags = ["生活", "工作", "学习", "美食", "旅行"]
 
@@ -67,7 +34,9 @@ export default function EditNotePage({ params }: { params: Promise<{ id: string 
 
   useEffect(() => {
     if (id) {
-      const foundNote = sampleNotes.find((n) => n.id === id)
+      // 从本地存储中查找笔记
+      const notes = getNotes()
+      const foundNote = notes.find((n) => n.id === id)
       if (foundNote) {
         setNote(foundNote)
         setContent(foundNote.content)
@@ -86,10 +55,36 @@ export default function EditNotePage({ params }: { params: Promise<{ id: string 
 
   const handleSave = async () => {
     setIsSaving(true)
-    // 模拟保存
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsSaving(false)
-    router.push(`/note/${id}`)
+    try {
+      // 更新笔记到本地存储
+      const updatedNote = updateNote(id, {
+        content,
+        tags: selectedTags,
+        image,
+      })
+      
+      if (updatedNote) {
+        await new Promise((resolve) => setTimeout(resolve, 500)) // 模拟保存延迟
+        router.push(`/note/${id}`)
+      } else {
+        console.error("Failed to update note")
+      }
+    } catch (error) {
+      console.error("Error saving note:", error)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleTogglePin = async () => {
+    try {
+      const updatedNote = togglePinNote(id)
+      if (updatedNote) {
+        setNote(updatedNote)
+      }
+    } catch (error) {
+      console.error("Error toggling pin:", error)
+    }
   }
 
   const toggleTag = (tag: string) => {
@@ -139,6 +134,16 @@ export default function EditNotePage({ params }: { params: Promise<{ id: string 
             <Button
               variant="ghost"
               size="sm"
+              onClick={handleTogglePin}
+              className="text-white hover:bg-white/20"
+            >
+              <Pin className={`h-4 w-4 mr-2 ${note.isPinned ? "fill-current" : ""}`} />
+              {note.isPinned ? "取消置顶" : "置顶"}
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={handleSave}
               disabled={isSaving}
               className="text-white hover:bg-white/20"
@@ -150,7 +155,7 @@ export default function EditNotePage({ params }: { params: Promise<{ id: string 
         </header>
 
         {/* Content */}
-        <main className="px-4 py-6">
+        <main className="px-4 py-6 pb-40">
           <div className="max-w-md mx-auto space-y-6">
             {/* Image Upload */}
             <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/20">

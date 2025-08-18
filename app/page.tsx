@@ -22,6 +22,11 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [showSearch, setShowSearch] = useState(true) // 默认显示搜索框
   const [isClient, setIsClient] = useState(false)
+  
+  // 手势相关状态
+  const [touchStartX, setTouchStartX] = useState(0)
+  const [touchStartY, setTouchStartY] = useState(0)
+  const [isSwiping, setIsSwiping] = useState(false)
 
   // 客户端检测和加载笔记
   useEffect(() => {
@@ -46,6 +51,52 @@ export default function HomePage() {
   const refreshNotes = useCallback(() => {
     loadNotes()
   }, [])
+
+  // 手势处理函数
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX)
+    setTouchStartY(e.touches[0].clientY)
+    setIsSwiping(false)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartX || !touchStartY) return
+
+    const touchEndX = e.touches[0].clientX
+    const touchEndY = e.touches[0].clientY
+    const deltaX = touchEndX - touchStartX
+    const deltaY = touchEndY - touchStartY
+    const absDeltaX = Math.abs(deltaX)
+    const absDeltaY = Math.abs(deltaY)
+
+    // 检测是否为横向滑动
+    if (absDeltaX > absDeltaY && absDeltaX > 50) {
+      setIsSwiping(true)
+      e.preventDefault()
+    }
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartX || !touchStartY || !isSwiping) return
+
+    const touchEndX = e.changedTouches[0].clientX
+    const deltaX = touchEndX - touchStartX
+
+    // 左滑清空搜索和筛选
+    if (deltaX < -100) {
+      clearSearch()
+      clearTagFilter()
+    }
+    // 右滑显示搜索框
+    else if (deltaX > 100) {
+      // 可以在这里添加其他功能
+    }
+
+    // 重置状态
+    setTouchStartX(0)
+    setTouchStartY(0)
+    setIsSwiping(false)
+  }
 
   const allTags = useMemo(() => {
     const tagSet = new Set<string>()
@@ -145,7 +196,13 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col safe-area-top relative">
+    <div 
+      className="min-h-screen flex flex-col safe-area-top relative"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      style={{ touchAction: 'pan-y' }}
+    >
       <AppHeader
         isMultiSelect={isMultiSelect}
         selectedCount={selectedNotes.length}
@@ -155,35 +212,41 @@ export default function HomePage() {
         }}
       />
 
-      <main className="flex-1 px-3 sm:px-4 py-4 sm:py-6 pb-24 safe-area-bottom smooth-scroll relative">
-        <div className="max-w-md mx-auto space-y-3 sm:space-y-4 mobile-spacing-y-3">
+      <main className="flex-1 px-2 sm:px-4 py-3 sm:py-6 safe-area-bottom smooth-scroll relative">
+        <div className="max-w-md mx-auto space-y-2 sm:space-y-4 mobile-spacing-y-2 pb-20">
           {/* 搜索框 - 始终显示 */}
-          <div className="animate-in slide-in-from-top-3 duration-300">
+          <div className="animate-in slide-in-from-top-3 duration-300 ease-out">
             <div className="relative">
               <Input
                 placeholder="搜索笔记内容或标签..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="input-modern pl-12 pr-10 h-14 sm:h-16 text-sm sm:text-base shadow-2xl"
+                className="input-modern pl-10 pr-8 h-12 sm:h-16 text-sm sm:text-base shadow-2xl"
+                enterKeyHint="search"
+                inputMode="search"
+                autoCapitalize="off"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck="false"
               />
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-brand-primary pointer-events-none" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-brand-primary pointer-events-none" />
               {searchQuery && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={clearSearch}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-brand-primary/10 transition-all duration-200 rounded-lg"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0 hover:bg-brand-primary/10 transition-all duration-200 ease-out rounded-lg"
                 >
-                  <X className="h-4 w-4 text-brand-primary" />
+                  <X className="h-3 w-3 text-brand-primary" />
                 </Button>
               )}
             </div>
           </div>
 
           {/* 标签筛选 - 始终显示在搜索框下方 */}
-          <div className="animate-in slide-in-from-top-4 duration-300">
-            <div className="glass-card p-6 shadow-2xl">
-              <div className="flex items-center justify-between mb-4">
+          <div className="animate-in slide-in-from-top-4 duration-300 ease-out">
+            <div className="glass-card p-4 sm:p-6 shadow-2xl">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <span className="text-sm font-semibold text-foreground flex items-center">
                   <span className="w-3 h-3 bg-gradient-to-r from-brand-primary to-brand-secondary rounded-full mr-2 float-animation"></span>
                   标签筛选
@@ -196,27 +259,27 @@ export default function HomePage() {
                       clearTagFilter()
                       clearSearch()
                     }}
-                    className="text-muted-foreground hover:text-foreground h-8 px-4 text-xs font-medium transition-all duration-200 hover:bg-brand-primary/10 rounded-lg"
+                    className="text-muted-foreground hover:text-foreground h-7 px-3 text-xs font-medium transition-all duration-200 ease-out hover:bg-brand-primary/10 rounded-lg"
                   >
                     <X className="h-3 w-3 mr-1" />
                     清除
                   </Button>
                 )}
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {allTags.map((tag) => (
                   <Badge
                     key={tag}
                     variant={selectedTags.includes(tag) ? "default" : "secondary"}
-                    className={`badge-modern cursor-pointer ${
+                    className={`badge-modern cursor-pointer text-xs sm:text-sm transition-all duration-200 ease-out ${
                       selectedTags.includes(tag)
                         ? "gradient-primary text-white shadow-lg"
-                        : "bg-muted/50 dark:bg-muted/20 text-muted-foreground hover:bg-brand-primary/10"
+                        : "bg-muted/60 dark:bg-muted/30 text-muted-foreground hover:bg-brand-primary/20 dark:hover:bg-brand-primary/20"
                     }`}
                     onClick={() => handleTagToggle(tag)}
                   >
                     {tag}
-                    {selectedTags.includes(tag) && <X className="h-3 w-3 ml-1" />}
+                    {selectedTags.includes(tag) && <X className="h-2.5 w-2.5 ml-1" />}
                   </Badge>
                 ))}
               </div>
@@ -224,7 +287,7 @@ export default function HomePage() {
           </div>
 
           {isMultiSelect && selectedNotes.length > 0 && (
-            <div className="glass-card p-4 sm:p-6 animate-in slide-in-from-top-2 duration-300">
+            <div className="glass-card p-3 sm:p-6 animate-in slide-in-from-top-2 duration-300">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex flex-col gap-1">
                   <span className="text-sm font-medium text-foreground">
@@ -247,7 +310,7 @@ export default function HomePage() {
                       console.error("Error deleting notes:", error)
                     }
                   }}
-                  className="btn-modern gradient-destructive text-white text-xs self-end sm:self-auto"
+                  className="btn-modern gradient-destructive text-white text-xs self-end sm:self-auto h-8 px-4"
                 >
                   删除选中
                 </Button>
@@ -256,34 +319,34 @@ export default function HomePage() {
           )}
 
           {(selectedTags.length > 0 || searchQuery) && (
-            <div className="flex flex-wrap gap-2 p-4 glass-card animate-in slide-in-from-left-3 duration-400">
+            <div className="flex flex-wrap gap-1.5 p-3 glass-card animate-in slide-in-from-left-3 duration-400">
               {searchQuery && (
                 <div className="flex items-center">
                   <span className="text-sm text-muted-foreground font-medium mr-2">搜索:</span>
                   <Badge
                     variant="secondary"
-                    className="badge-modern gradient-primary text-white cursor-pointer"
+                    className="badge-modern gradient-primary text-white cursor-pointer text-xs"
                     onClick={clearSearch}
                   >
                     {searchQuery}
-                    <X className="h-3 w-3 ml-1" />
+                    <X className="h-2.5 w-2.5 ml-1" />
                   </Badge>
                 </div>
               )}
 
               {selectedTags.length > 0 && (
-                <div className="flex items-center flex-wrap gap-2">
+                <div className="flex items-center flex-wrap gap-1.5">
                   <span className="text-sm text-muted-foreground font-medium">标签:</span>
                   {selectedTags.map((tag, index) => (
                     <Badge
                       key={tag}
                       variant="secondary"
-                      className="badge-modern gradient-secondary text-white cursor-pointer"
+                      className="badge-modern gradient-secondary text-white cursor-pointer text-xs"
                       style={{ animationDelay: `${index * 100}ms` }}
                       onClick={() => handleTagToggle(tag)}
                     >
                       {tag}
-                      <X className="h-3 w-3 ml-1" />
+                      <X className="h-2.5 w-2.5 ml-1" />
                     </Badge>
                   ))}
                 </div>
@@ -346,11 +409,11 @@ export default function HomePage() {
           </div>
           
           {filteredNotes.length === 0 && (selectedTags.length > 0 || searchQuery) && (
-            <div className="text-center py-8 sm:py-12 animate-in zoom-in-50 duration-500">
+            <div className="text-center py-6 sm:py-12 animate-in zoom-in-50 duration-500">
               <div className="text-muted-foreground/60 mb-4">
-                <Search className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-2 opacity-50 pulse-animation" />
-                <p className="text-base sm:text-lg font-medium">没有找到相关小纸条</p>
-                <p className="text-sm">试试调整搜索关键词或筛选条件</p>
+                <Search className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-2 opacity-50 pulse-animation" />
+                <p className="text-sm sm:text-base font-medium">没有找到相关小纸条</p>
+                <p className="text-xs sm:text-sm">试试调整搜索关键词或筛选条件</p>
               </div>
               <Button
                 variant="outline"
@@ -358,7 +421,7 @@ export default function HomePage() {
                   clearTagFilter()
                   clearSearch()
                 }}
-                className="mt-4 bg-transparent transition-all duration-300 hover:scale-105 hover:shadow-md text-sm"
+                className="mt-3 sm:mt-4 bg-transparent transition-all duration-300 hover:scale-105 hover:shadow-md text-xs sm:text-sm"
               >
                 清除所有筛选
               </Button>
@@ -369,9 +432,9 @@ export default function HomePage() {
         <Link href="/create" className="relative z-50">
           <Button
             size="lg"
-            className="fab-modern"
+            className="fab-modern h-14 w-14 sm:h-16 sm:w-16"
           >
-            <Plus className="h-6 w-6 text-white transition-transform duration-300 group-hover:rotate-90" />
+            <Plus className="h-6 w-6 sm:h-7 sm:w-7 text-white transition-transform duration-300 group-hover:rotate-90" />
           </Button>
         </Link>
       </main>

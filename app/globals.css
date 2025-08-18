@@ -206,6 +206,12 @@
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   }
   
+  .dark .glass-morphism {
+    background: rgba(26, 28, 61, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+  
   .glass-card {
     background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(10px);
@@ -213,6 +219,12 @@
     border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     border-radius: 1rem;
+  }
+  
+  .dark .glass-card {
+    background: rgba(26, 28, 61, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   }
 
   /* Modern header design */
@@ -223,7 +235,7 @@
 
   /* Enhanced note card design */
   .note-card {
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -233,7 +245,7 @@
   }
 
   .dark .note-card {
-    background: rgba(26, 28, 61, 0.8);
+    background: rgba(26, 28, 61, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
@@ -241,6 +253,10 @@
   .note-card:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+  }
+
+  .dark .note-card:hover {
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
   }
 
   /* Modern footer design */
@@ -308,6 +324,22 @@
     outline: none;
     ring: 2px solid #667eea;
     ring-offset: 2px solid oklch(1 0 0);
+  }
+
+  .dark .input-modern {
+    background: rgba(26, 28, 61, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: oklch(0.985 0 0);
+  }
+  
+  .dark .input-modern::placeholder {
+    color: oklch(0.708 0 0);
+    opacity: 0.8;
+  }
+  
+  .dark .input-modern:focus {
+    ring: 2px solid #667eea;
+    ring-offset: 2px solid oklch(0.145 0 0);
   }
 
   /* Modern badge styles */

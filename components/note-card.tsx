@@ -34,6 +34,7 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
   const router = useRouter()
 
   const handleTogglePin = async (e: React.MouseEvent) => {
+    e.preventDefault()
     e.stopPropagation()
     try {
       await togglePinNote(note.id)
@@ -47,31 +48,43 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
   let pressTimer: NodeJS.Timeout | null = null
   let touchStartY = 0
   let touchStartX = 0
+  let lastTouchY = 0
+  let isScrolling = false
 
   const handleTouchStart = (e: React.TouchEvent) => {
     e.preventDefault()
     setIsPressed(true)
     touchStartY = e.touches[0].clientY
     touchStartX = e.touches[0].clientX
+    lastTouchY = touchStartY
+    isScrolling = false
     
     pressTimer = setTimeout(() => {
-      onLongPress()
+      if (!isScrolling) {
+        onLongPress()
+      }
     }, 500)
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    // 如果用户移动了手指超过一定距离，取消长按
-    if (pressTimer) {
-      const touchY = e.touches[0].clientY
-      const touchX = e.touches[0].clientX
-      const deltaY = Math.abs(touchY - touchStartY)
-      const deltaX = Math.abs(touchX - touchStartX)
-      
-      if (deltaY > 10 || deltaX > 10) {
-        clearTimeout(pressTimer)
-        pressTimer = null
-      }
+    const touchY = e.touches[0].clientY
+    const touchX = e.touches[0].clientX
+    const deltaY = Math.abs(touchY - touchStartY)
+    const deltaX = Math.abs(touchX - touchStartX)
+    const scrollDeltaY = Math.abs(touchY - lastTouchY)
+    
+    // 检测是否在滚动
+    if (scrollDeltaY > 5) {
+      isScrolling = true
     }
+    
+    // 如果用户移动了手指超过一定距离，取消长按
+    if (pressTimer && (deltaY > 15 || deltaX > 15)) {
+      clearTimeout(pressTimer)
+      pressTimer = null
+    }
+    
+    lastTouchY = touchY
   }
 
   const handleTouchEnd = (e: React.TouchEvent) => {
@@ -88,7 +101,7 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
     const deltaY = Math.abs(touchEndY - touchStartY)
     const deltaX = Math.abs(touchEndX - touchStartX)
     
-    if (deltaY < 10 && deltaX < 10 && !isMultiSelect) {
+    if (deltaY < 10 && deltaX < 10 && !isMultiSelect && !isScrolling) {
       router.push(`/note/${note.id}`)
     }
   }
@@ -113,11 +126,15 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
 
   return (
     <Card
-      className={`note-card p-4 sm:p-6 cursor-pointer group touch-optimized card-touch ${
+      className={`note-card p-4 sm:p-6 cursor-pointer group touch-optimized card-touch select-none ${
         isSelected ? "ring-2 ring-brand-primary shadow-2xl" : ""
-      } ${isPressed ? "scale-95" : ""}`}
+      } ${isPressed ? "scale-95 opacity-90" : ""}`}
       style={{
         animationDelay: `${index * 100}ms`,
+        touchAction: 'manipulation',
+        WebkitTapHighlightColor: 'transparent',
+        userSelect: 'none',
+        transition: 'transform 0.2s ease, opacity 0.2s ease, box-shadow 0.3s ease',
       }}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
@@ -156,7 +173,7 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
               className={`badge-modern cursor-pointer ${
                 false 
                   ? "gradient-primary text-white shadow-lg" 
-                  : "bg-muted/50 dark:bg-muted/20 text-muted-foreground hover:bg-brand-primary/10"
+                  : "bg-muted/60 dark:bg-muted/30 text-muted-foreground hover:bg-brand-primary/20 dark:hover:bg-brand-primary/20"
               }`}
               style={{
                 animationDelay: `${index * 100 + tagIndex * 50}ms`,
@@ -181,12 +198,16 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
             variant="ghost"
             size="sm"
             onClick={handleTogglePin}
-            className={`transition-all duration-300 hover:scale-110 p-1 h-7 w-7 sm:h-8 sm:w-8 rounded-lg hover:bg-brand-primary/10 ${
+            className={`transition-all duration-200 ease-out hover:scale-110 active:scale-95 p-1 h-8 w-8 sm:h-8 sm:w-8 rounded-lg hover:bg-brand-primary/10 ${
               note.isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
             }`}
+            style={{ 
+              touchAction: 'manipulation',
+              transition: 'transform 0.2s ease-out, opacity 0.2s ease-out, background-color 0.2s ease-out'
+            }}
           >
             <Pin
-              className={`h-3 w-3 sm:h-4 sm:w-4 transition-all duration-300 ${
+              className={`h-4 w-4 transition-all duration-200 ease-out ${
                 note.isPinned 
                   ? "fill-brand-primary text-brand-primary scale-110" 
                   : "text-muted-foreground hover:text-brand-primary"
@@ -199,13 +220,18 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
             variant="ghost"
             size="sm"
             onClick={(e) => {
+              e.preventDefault()
               e.stopPropagation()
               setIsLiked(!isLiked)
             }}
-            className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 p-1 h-7 w-7 sm:h-8 sm:w-8 rounded-lg hover:bg-brand-primary/10"
+            className="opacity-0 group-hover:opacity-100 transition-all duration-200 ease-out hover:scale-110 active:scale-95 p-1 h-8 w-8 sm:h-8 sm:w-8 rounded-lg hover:bg-brand-primary/10"
+            style={{ 
+              touchAction: 'manipulation',
+              transition: 'transform 0.2s ease-out, opacity 0.2s ease-out, background-color 0.2s ease-out'
+            }}
           >
             <Heart
-              className={`h-3 w-3 sm:h-4 sm:w-4 transition-all duration-300 ${
+              className={`h-4 w-4 transition-all duration-200 ease-out ${
                 isLiked ? "fill-brand-primary text-brand-primary scale-110" : "text-muted-foreground hover:text-brand-primary"
               }`}
             />

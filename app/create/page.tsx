@@ -709,19 +709,21 @@ export default function CreateNotePage() {
               variant="ghost"
               size="sm"
               onClick={() => router.push("/")}
-              className="text-white hover:bg-white/20 p-2 transition-all duration-300 hover:scale-110"
+              className="text-white hover:bg-white/20 h-9 w-9 p-0 transition-all duration-300 hover:scale-110"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-4 w-4" />
             </Button>
             <h1 className="text-lg font-serif font-black">新建小纸条</h1>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1">
             {/* 主题切换按钮 */}
-            <ThemeToggle />
+            <div className="h-9 w-9 flex items-center justify-center">
+              <ThemeToggle />
+            </div>
             <Button
               onClick={handleSave}
               disabled={(!content.trim() && todoItems.length === 0) || isSaving}
-              className="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-lg 
+              className="bg-white/20 hover:bg-white/30 text-white font-medium px-3 py-2 h-9 rounded-lg 
                          transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:scale-100"
             >
               {isSaving ? (
@@ -740,7 +742,7 @@ export default function CreateNotePage() {
         </div>
       </header>
 
-      <main className="max-w-md mx-auto px-4 py-6 space-y-6">
+      <main className="max-w-md mx-auto px-4 py-6 pb-40 space-y-6">
         {/* 文本输入区域 */}
         <Card className="note-card p-4 animate-in slide-in-from-top-2 duration-300">
           <div className="space-y-4">
@@ -755,7 +757,13 @@ export default function CreateNotePage() {
                            bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 
                            placeholder-slate-400 dark:placeholder-slate-500
                            focus:outline-none focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-600
-                           resize-none transition-all duration-300"
+                           resize-none transition-all duration-300 text-base leading-relaxed"
+                  enterKeyHint="enter"
+                  autoCapitalize="sentences"
+                  autoComplete="off"
+                  autoCorrect="on"
+                  spellCheck="true"
+                  inputMode="text"
                 />
                 {content && (
                   <Button
@@ -832,8 +840,13 @@ export default function CreateNotePage() {
                     onChange={(e) => setNewTodoText(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && addTodoItem()}
                     className="flex-1"
+                    enterKeyHint="enter"
+                    autoCapitalize="sentences"
+                    autoComplete="off"
+                    autoCorrect="on"
+                    spellCheck="false"
                   />
-                  <Button onClick={addTodoItem} size="sm">
+                  <Button onClick={addTodoItem} size="sm" className="h-9 px-3">
                     添加
                   </Button>
                 </div>

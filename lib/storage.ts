@@ -110,10 +110,17 @@ export const deleteNote = (id: string): boolean => {
 
 // 切换置顶状态
 export const togglePinNote = (id: string): Note | null => {
+  if (typeof window === 'undefined') {
+    throw new Error('Cannot toggle pin on server side')
+  }
+  
   const existingNotes = getNotes()
   const noteIndex = existingNotes.findIndex(note => note.id === id)
   
-  if (noteIndex === -1) return null
+  if (noteIndex === -1) {
+    console.warn(`Note with id ${id} not found`)
+    return null
+  }
   
   const note = existingNotes[noteIndex]
   const updatedNote = {
