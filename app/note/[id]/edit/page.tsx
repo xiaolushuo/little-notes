@@ -125,9 +125,9 @@ export default function EditNotePage({ params }: { params: Promise<{ id: string 
         </div>
       )}
       
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-rose-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 relative">
+      <div className="min-h-screen bg-gradient-to-br from-brand-light via-white to-blue-50 dark:from-brand-dark dark:via-gray-900 dark:to-slate-900 relative">
         {/* Header */}
-        <header className="gradient-header text-white px-4 py-4 shadow-lg sticky top-0 z-50">
+        <header className="gradient-header text-white px-3 sm:px-4 py-3 sm:py-4 shadow-2xl sticky top-0 z-50 backdrop-blur-sm">
           <div className="max-w-md mx-auto flex items-center justify-between">
             <Button variant="ghost" size="sm" onClick={() => router.back()} className="text-white hover:bg-white/20">
               <ArrowLeft className="h-4 w-4 mr-2" />

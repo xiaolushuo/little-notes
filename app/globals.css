@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -38,11 +37,25 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  /* Added custom colors for the Little Notes app */
-  --rose-primary: #be123c;
-  --rose-light: #fdf2f8;
-  --pink-accent: #ec4899;
-  --slate-text: #475569;
+  /* Modern color palette for Little Notes app */
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --dark-gradient: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+  
+  /* Glass morphism colors */
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  
+  /* Brand colors */
+  --brand-primary: #667eea;
+  --brand-secondary: #764ba2;
+  --brand-accent: #f093fb;
+  --brand-light: #f8f9ff;
+  --brand-dark: #1a1c3d;
 }
 
 .dark {
@@ -79,11 +92,12 @@
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
 
-  /* Dark mode colors for Little Notes */
-  --rose-primary: #fb7185;
-  --rose-light: #1f1f23;
-  --pink-accent: #f472b6;
-  --slate-text: #cbd5e1;
+  /* Dark mode brand colors */
+  --glass-bg: rgba(0, 0, 0, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --brand-light: #1a1c3d;
+  --brand-dark: #f8f9ff;
 }
 
 @theme inline {
@@ -124,11 +138,21 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Custom color utilities for the app */
-  --color-rose-primary: var(--rose-primary);
-  --color-rose-light: var(--rose-light);
-  --color-pink-accent: var(--pink-accent);
-  --color-slate-text: var(--slate-text);
+  /* Modern color utilities for the app */
+  --color-primary-gradient: var(--primary-gradient);
+  --color-secondary-gradient: var(--secondary-gradient);
+  --color-accent-gradient: var(--accent-gradient);
+  --color-success-gradient: var(--success-gradient);
+  --color-warning-gradient: var(--warning-gradient);
+  --color-dark-gradient: var(--dark-gradient);
+  --color-glass-bg: var(--glass-bg);
+  --color-glass-border: var(--glass-border);
+  --color-glass-shadow: var(--glass-shadow);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-light: var(--brand-light);
+  --color-brand-dark: var(--brand-dark);
 }
 
 @layer base {
@@ -136,37 +160,172 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-gradient-to-br from-rose-50 to-pink-50 dark:from-gray-900 dark:to-gray-800 text-foreground min-h-screen;
+    @apply bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-slate-900 text-foreground min-h-screen;
+    background-attachment: fixed;
+    background-size: cover;
   }
 }
 
-/* Custom utilities for the Little Notes app */
+/* Modern utilities for the Little Notes app */
 @layer utilities {
-  .gradient-header {
-    background: linear-gradient(135deg, var(--rose-primary) 0%, var(--pink-accent) 100%);
+  /* Modern gradient utilities */
+  .gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .gradient-secondary {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+  
+  .gradient-accent {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+  
+  .gradient-success {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  }
+  
+  .gradient-warning {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  }
+  
+  .gradient-dark {
+    background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+  }
+  
+  .gradient-destructive {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
   }
 
-  .note-card {
-    background: rgba(255, 255, 255, 0.7);
+  /* Glass morphism utilities */
+  .glass-morphism {
+    background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border-radius: 1rem;
+  }
+
+  /* Modern header design */
+  .gradient-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  }
+
+  /* Enhanced note card design */
+  .note-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
+    border-radius: 1rem;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
   .dark .note-card {
-    background: rgba(31, 31, 35, 0.7);
+    background: rgba(26, 28, 61, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
 
+  .note-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+  }
+
+  /* Modern footer design */
   .footer-blur {
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 
   .dark .footer-blur {
-    background: rgba(31, 31, 35, 0.8);
+    background: rgba(26, 28, 61, 0.9);
   }
 
-  /* 移动端触摸优化 */
+  /* Modern button styles */
+  .btn-modern {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    transform: scale(1);
+  }
+  
+  .btn-modern:hover {
+    transform: scale(1.05);
+  }
+  
+  .btn-modern:active {
+    transform: scale(0.95);
+  }
+  
+  .btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+  }
+  
+  .btn-modern:hover::before {
+    left: 100%;
+  }
+
+  /* Modern input styles */
+  .input-modern {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: oklch(0.145 0 0);
+    transition: all 0.3s ease;
+  }
+  
+  .input-modern::placeholder {
+    color: oklch(0.556 0 0);
+    opacity: 0.6;
+  }
+  
+  .input-modern:focus {
+    outline: none;
+    ring: 2px solid #667eea;
+    ring-offset: 2px solid oklch(1 0 0);
+  }
+
+  /* Modern badge styles */
+  .badge-modern {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .badge-modern:hover {
+    transform: scale(1.05);
+  }
+
+  /* Mobile touch optimization */
   .touch-optimized {
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
@@ -174,31 +333,13 @@
     user-select: none;
   }
 
-  /* 移动端滚动优化 */
+  /* Mobile scroll optimization */
   .smooth-scroll {
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
   }
 
-  /* 移动端按钮触摸反馈 */
-  .touch-feedback {
-    /* Touch feedback removed */
-  }
-
-  .touch-feedback:active {
-    /* Touch feedback removed */
-  }
-
-  /* 移动端卡片触摸效果 */
-  .card-touch {
-    /* Touch effects removed */
-  }
-
-  .card-touch:active {
-    /* Touch effects removed */
-  }
-
-  /* 移动端安全区域适配 */
+  /* Mobile safe area adaptation */
   .safe-area-top {
     padding-top: env(safe-area-inset-top);
   }
@@ -215,7 +356,7 @@
     padding-right: env(safe-area-inset-right);
   }
 
-  /* 移动端文本大小优化 */
+  /* Mobile text size optimization */
   .mobile-text-sm {
     font-size: 0.875rem;
     line-height: 1.25rem;
@@ -226,7 +367,7 @@
     line-height: 1.5rem;
   }
 
-  /* 移动端间距优化 */
+  /* Mobile spacing optimization */
   .mobile-spacing-y-2 {
     gap: 0.5rem;
   }
@@ -238,590 +379,128 @@
   .mobile-spacing-y-4 {
     gap: 1rem;
   }
-}
 
-/* ===================== */
-/* 独立主题系统开始 */
-/* ===================== */
+  /* Animation utilities */
+  .float-animation {
+    animation: float 3s ease-in-out infinite;
+  }
 
-/* 主题变量定义 */
-:root {
-  /* 默认主题变量 - 设置为蜡笔小新主题避免闪烁 */
-  --theme-primary: #ff6b35;
-  --theme-secondary: #f7931e;
-  --theme-accent: #ffeb3b;
-  --theme-background: #fff8e1;
-  --theme-surface: #ffffff;
-  --theme-text: #5d4037;
-  --theme-text-secondary: #8d6e63;
-  --theme-border: #ffcc02;
-  --theme-font-primary: 'Comic Sans MS', 'Marker Felt', 'Chalkboard', cursive;
-  --theme-font-secondary: Arial, sans-serif;
-  --theme-border-radius: 16px;
-  --theme-shadow: 0 8px 16px rgba(255, 107, 53, 0.2);
-  --theme-animation: none;
-  --theme-icon-set: default;
-  --theme-bg-pattern: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
-  --theme-bg-home: url('/crayon-background.jpg');
-  --theme-bg-notes: url('/crayon-background.jpg');
-}
+  .pulse-animation {
+    animation: pulse 2s ease-in-out infinite;
+  }
 
-/* 移动端背景图片优化 */
-.theme-crayon,
-.theme-sakura {
-  /* 重置基础样式 */
-  background: var(--theme-bg-pattern) !important;
-  background-attachment: fixed !important;
-  font-family: var(--theme-font-primary) !important;
-  color: var(--theme-text) !important;
-}
+  .bounce-animation {
+    animation: bounce 1s ease-in-out infinite;
+  }
 
-/* 移动端背景图片处理 */
-@media (max-width: 768px) {
-  /* 默认背景（当没有主题类名时） - 使用透明背景避免闪烁 */
-  body:not(.theme-crayon):not(.theme-sakura) {
-    background: transparent !important;
-    min-height: 100vh !important;
+  /* Brand color utilities */
+  .text-brand-primary {
+    color: #667eea;
   }
   
-  .theme-crayon {
-    background-image: var(--theme-bg-home, url('/crayon-background.jpg')) !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-attachment: scroll !important;
-    min-height: 100vh !important;
+  .text-brand-secondary {
+    color: #764ba2;
   }
   
-  .theme-sakura {
-    background-image: var(--theme-bg-home, url('/sakura-background.jpg')) !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-attachment: scroll !important;
-    min-height: 100vh !important;
+  .text-brand-accent {
+    color: #f093fb;
   }
   
-  /* 移动端背景图片性能优化 */
-  .theme-crayon::before,
-  .theme-sakura::before {
-    content: '';
+  .text-brand-light {
+    color: #f8f9ff;
+  }
+  
+  .text-brand-dark {
+    color: #1a1c3d;
+  }
+  
+  .bg-brand-primary {
+    background-color: #667eea;
+  }
+  
+  .bg-brand-secondary {
+    background-color: #764ba2;
+  }
+  
+  .bg-brand-accent {
+    background-color: #f093fb;
+  }
+  
+  .bg-brand-light {
+    background-color: #f8f9ff;
+  }
+  
+  .bg-brand-dark {
+    background-color: #1a1c3d;
+  }
+
+  /* Floating action button styles */
+  .fab-modern {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(2px);
-    z-index: -1;
-    pointer-events: none;
+    bottom: 5rem;
+    right: 1.5rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    z-index: 50;
+  }
+
+  .fab-modern:hover {
+    transform: scale(1.1);
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.6);
   }
   
-  /* 移动端卡片透明度优化 */
-  .theme-crayon .note-card,
-  .theme-sakura .note-card {
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(10px) !important;
+  .fab-modern:active {
+    transform: scale(0.95);
   }
 }
 
-/* 桌面端背景图片处理 */
-@media (min-width: 769px) {
-  /* 默认背景（当没有主题类名时） - 使用透明背景避免闪烁 */
-  body:not(.theme-crayon):not(.theme-sakura) {
-    background: transparent !important;
-    min-height: 100vh !important;
-  }
-  
-  .theme-crayon {
-    background-image: var(--theme-bg-home, url('/crayon-background.jpg')) !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-attachment: fixed !important;
-    min-height: 100vh !important;
-  }
-  
-  .theme-sakura {
-    background-image: var(--theme-bg-home, url('/sakura-background.jpg')) !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-attachment: fixed !important;
-    min-height: 100vh !important;
-  }
-  
-  /* 桌面端背景叠加效果 */
-  .theme-crayon::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      radial-gradient(circle at 20% 80%, rgba(255, 204, 2, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(247, 147, 30, 0.1) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: -1;
-  }
-  
-  .theme-sakura::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      radial-gradient(circle at 20% 80%, rgba(255, 182, 193, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(255, 105, 180, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(255, 192, 203, 0.15) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: -1;
-  }
-  
-  body:not(.theme-crayon):not(.theme-sakura)::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: transparent;
-    pointer-events: none;
-    z-index: -1;
-  }
+/* Keyframe animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
 
-.theme-crayon .gradient-header,
-.theme-sakura .gradient-header {
-  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 100%) !important;
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
-.theme-crayon .note-card,
-.theme-sakura .note-card {
-  background: var(--theme-surface) !important;
-  border: 2px solid var(--theme-border) !important;
-  border-radius: var(--theme-border-radius) !important;
-  box-shadow: var(--theme-shadow) !important;
-  color: var(--theme-text) !important;
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
 }
 
-.theme-crayon .card,
-.theme-sakura .card {
-  background: var(--theme-surface) !important;
-  border: 2px solid var(--theme-border) !important;
-  border-radius: var(--theme-border-radius) !important;
-  box-shadow: var(--theme-shadow) !important;
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-.theme-crayon button,
-.theme-sakura button {
-  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 100%) !important;
-  color: white !important;
-  border: none !important;
-  border-radius: var(--theme-border-radius) !important;
-  box-shadow: var(--theme-shadow) !important;
-  font-family: var(--theme-font-primary) !important;
-}
-
-.theme-crayon button:hover,
-.theme-sakura button:hover {
-  /* Hover effects removed */
-}
-
-.theme-crayon .badge,
-.theme-sakura .badge {
-  background: var(--theme-accent) !important;
-  color: var(--theme-text) !important;
-  border: 2px solid var(--theme-border) !important;
-  border-radius: calc(var(--theme-border-radius) - 4px) !important;
-  font-family: var(--theme-font-primary) !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-}
-
-.theme-crayon .badge:hover,
-.theme-sakura .badge:hover {
-  /* Hover effects removed */
-}
-
-.theme-crayon input,
-.theme-sakura input,
-.theme-crayon textarea,
-.theme-sakura textarea {
-  background: var(--theme-surface) !important;
-  border: 2px solid var(--theme-border) !important;
-  border-radius: var(--theme-border-radius) !important;
-  color: var(--theme-text) !important;
-  font-family: var(--theme-font-primary) !important;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-}
-
-.theme-crayon input:focus,
-.theme-sakura input:focus,
-.theme-crayon textarea:focus,
-.theme-sakura textarea:focus {
-  border-color: var(--theme-primary) !important;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 3px var(--theme-primary) !important;
-  outline: none !important;
-}
-
-/* 蜡笔小新主题特定样式 */
-.theme-crayon {
-  /* 蜡笔风格背景 */
-  --theme-bg-pattern: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%) !important;
-  
-  /* 蜡笔风格装饰 */
-  position: relative;
-}
-
-.theme-crayon::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 80%, rgba(255, 204, 2, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(247, 147, 30, 0.1) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: -1;
-}
-
-.theme-crayon .note-card {
-  border: 3px solid var(--theme-border) !important;
+/* Modern card touch feedback */
+.card-touch {
   position: relative;
   overflow: hidden;
 }
 
-.theme-crayon .note-card::before {
+.card-touch::after {
   content: '';
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(45deg, var(--theme-primary), var(--theme-secondary), var(--theme-accent), var(--theme-primary));
-  border-radius: calc(var(--theme-border-radius) + 2px);
-  z-index: -1;
-  opacity: 0.7;
-}
-
-.theme-crayon button {
-  font-weight: bold !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-}
-
-.theme-crayon .badge {
-  font-weight: bold !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-}
-
-/* 魔法小樱主题特定样式 */
-.theme-sakura {
-  /* 樱花风格背景 */
-  --theme-bg-pattern: linear-gradient(135deg, #fef7f7 0%, #fce4ec 100%) !important;
-  
-  /* 魔法风格装饰 */
-  position: relative;
-}
-
-.theme-sakura::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 80%, rgba(255, 182, 193, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 105, 180, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(255, 192, 203, 0.15) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: -1;
-}
-
-.theme-sakura .note-card {
-  backdrop-filter: blur(10px) !important;
-  border: 2px solid var(--theme-border) !important;
-}
-
-.theme-sakura .note-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 182, 193, 0.1) 0%, rgba(255, 105, 180, 0.1) 100%);
-  border-radius: var(--theme-border-radius);
-  pointer-events: none;
-}
-
-.theme-sakura button {
-  font-style: italic !important;
-  font-weight: 500 !important;
-  position: relative;
-  overflow: hidden;
-}
-
-.theme-sakura button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  /* Transition removed */
-}
-
-.theme-sakura button:hover::before {
-  left: 100%;
-}
-
-.theme-sakura .badge {
-  font-style: italic !important;
-  font-weight: 500 !important;
-}
-
-/* 主题特定动画 */
-.theme-crayon .animate-in {
-  /* Animation removed */
-}
-
-/* Animation keyframes removed */
-
-.theme-sakura .animate-in {
-  /* Animation removed */
-}
-
-/* Animation keyframes removed */
-
-.theme-crayon button:hover {
-  /* Animation removed */
-}
-
-/* Animation keyframes removed */
-
-.theme-sakura button:hover {
-  /* Animation removed */
-}
-
-/* Animation keyframes removed */
-
-/* 主题切换动画 */
-.theme-switching {
-  position: relative;
-  overflow: hidden;
-}
-
-.theme-switching::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  /* Animation removed */
-  z-index: 1000;
-  pointer-events: none;
-}
-
-/* Animation keyframes removed */
-
-/* ===================== */
-/* 独立主题系统结束 */
-/* ===================== */
-
-/* ===================== */
-/* 图标样式系统开始 */
-/* ===================== */
-
-/* 图标变量定义 */
-:root {
-  --icon-size-default: 24px;
-  --icon-size-small: 16px;
-  --icon-size-large: 32px;
-  --icon-color-default: currentColor;
-  --icon-color-cute: #ff69b4;
-  --icon-color-minimal: #6b7280;
-  --icon-color-colorful: linear-gradient(45deg, #ff6b35, #f7931e, #ffeb3b);
-  --icon-color-outline: #374151;
-}
-
-/* 默认图标样式 */
-.icons-default svg {
-  color: var(--icon-color-default);
-  stroke-width: 2;
-  fill: none;
-  stroke: currentColor;
-}
-
-.icons-default svg.filled {
-  fill: currentColor;
-  stroke: none;
-}
-
-/* 可爱风格图标 */
-.icons-cute svg {
-  color: var(--icon-color-cute);
-  stroke-width: 1.5;
-  fill: none;
-  stroke: currentColor;
-  filter: drop-shadow(0 2px 4px rgba(255, 105, 180, 0.3));
-}
-
-.icons-cute svg.filled {
-  fill: currentColor;
-  stroke: none;
-}
-
-.icons-cute svg:hover {
-  /* Hover effects removed */
-}
-
-/* 极简风格图标 */
-.icons-minimal svg {
-  color: var(--icon-color-minimal);
-  stroke-width: 1;
-  fill: none;
-  stroke: currentColor;
-}
-
-.icons-minimal svg.filled {
-  fill: currentColor;
-  stroke: none;
-}
-
-.icons-minimal svg {
-  opacity: 0.7;
-}
-
-.icons-minimal svg:hover {
-  /* Hover effects removed */
-}
-
-/* 彩色图标 */
-.icons-colorful svg {
-  stroke-width: 2;
-  fill: none;
-  stroke: url(#colorful-gradient);
-}
-
-.icons-colorful svg.filled {
-  fill: url(#colorful-gradient);
-  stroke: none;
-}
-
-/* 为彩色图标创建渐变 */
-.icons-colorful::before {
-  content: '';
-  position: absolute;
+  top: 50%;
+  left: 50%;
   width: 0;
   height: 0;
-  pointer-events: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
 }
 
-.icons-colorful {
-  position: relative;
+.card-touch:active::after {
+  width: 300px;
+  height: 300px;
 }
-
-.icons-colorful svg {
-  background: linear-gradient(45deg, #ff6b35, #f7931e, #ffeb3b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* 轮廓图标 */
-.icons-outline svg {
-  color: var(--icon-color-outline);
-  stroke-width: 2;
-  fill: none;
-  stroke: currentColor;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-}
-
-.icons-outline svg.filled {
-  fill: none;
-  stroke: currentColor;
-}
-
-.icons-outline svg:hover {
-  stroke-width: 2.5;
-  /* Hover effects removed */
-}
-
-/* 图标尺寸工具类 */
-.icon-sm {
-  width: var(--icon-size-small);
-  height: var(--icon-size-small);
-}
-
-.icon-md {
-  width: var(--icon-size-default);
-  height: var(--icon-size-default);
-}
-
-.icon-lg {
-  width: var(--icon-size-large);
-  height: var(--icon-size-large);
-}
-
-/* 图标动画 */
-.icon-animate-bounce {
-  /* Animation removed */
-}
-
-.icon-animate-spin {
-  /* Animation removed */
-}
-
-.icon-animate-pulse {
-  /* Animation removed */
-}
-
-/* Animation keyframes removed */
-
-/* ===================== */
-/* 图标样式系统结束 */
-/* ===================== */
-
-/* ===================== */
-/* 动画系统开始 */
-/* ===================== */
-
-/* 全局动画类 */
-.animate-theme {
-  /* Animation removed */
-}
-
-/* Animation keyframes removed */
-
-/* 应用动画到主题元素 */
-.theme-crayon .note-card,
-.theme-sakura .note-card {
-  /* Animation removed */
-}
-
-.theme-crayon .card,
-.theme-sakura .card {
-  /* Animation removed */
-}
-
-.theme-crayon button,
-.theme-sakura button {
-  /* Animation removed */
-}
-
-/* ===================== */
-/* 动画系统结束 */
-/* ===================== */

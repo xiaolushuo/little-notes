@@ -9,10 +9,9 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { saveNote, type Note, type TodoItem } from "@/lib/storage"
 
 const BUILT_IN_TAGS = ["生活", "工作", "学习", "美食", "旅行", "健康", "娱乐", "购物"]
-
-// Added expiration and reminder presets
 const EXPIRATION_PRESETS = [
   { label: "1小时", value: 1, unit: "hour" },
   { label: "3小时", value: 3, unit: "hour" },
@@ -33,14 +32,7 @@ const REMINDER_PRESETS = [
   { label: "1天前", value: 1, unit: "day" },
 ]
 
-// Added Todo item interface
-interface TodoItem {
-  id: string
-  text: string
-  completed: boolean
-  indent: number
-  children?: TodoItem[]
-}
+// Added expiration and reminder presets
 
 const TEXT_TEMPLATES = [
   {
@@ -671,36 +663,45 @@ export default function CreateNotePage() {
 
   const handleSave = async () => {
     setIsSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    
+    try {
+      const allTags = [...selectedTags, ...customTags]
+      const finalContent = isTodoMode ? convertTodosToMarkdown() : content
 
-    const allTags = [...selectedTags, ...customTags]
-    const finalContent = isTodoMode ? convertTodosToMarkdown() : content
-
-    const newNote = {
-      content: finalContent,
-      todos: isTodoMode ? todoItems : undefined,
-      tags: allTags,
-      image: uploadedImage,
-      drawing: drawingData,
-      audio: audioUrl,
-      transcription,
-      // Added time management data to save
-      expirationDate,
-      reminderTime,
-      reminderType,
-      createdAt: new Date(),
+      const noteData = {
+        content: finalContent,
+        tags: allTags,
+        image: uploadedImage,
+        drawing: drawingData,
+        audio: audioUrl,
+        transcription,
+        expirationDate,
+        reminderTime,
+        reminderType,
+        todos: isTodoMode ? todoItems : undefined,
+      }
+      
+      const savedNote = saveNote(noteData)
+      console.log("Note saved successfully:", savedNote)
+      
+      // 短暂延迟后跳转，让用户看到保存成功的效果
+      setTimeout(() => {
+        setIsSaving(false)
+        router.push("/")
+      }, 500)
+    } catch (error) {
+      console.error("Error saving note:", error)
+      setIsSaving(false)
+      // 这里可以添加错误提示，比如使用toast
     }
-    console.log("Saving note:", newNote)
-    setIsSaving(false)
-    router.push("/")
   }
 
   const allTags = [...selectedTags, ...customTags]
   const expirationStatus = getExpirationStatus(expirationDate)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 dark:from-gray-900 dark:to-gray-800">
-      <header className="gradient-header text-white px-4 py-4 shadow-lg sticky top-0 z-50">
+    <div className="min-h-screen bg-gradient-to-br from-brand-light via-white to-blue-50 dark:from-brand-dark dark:via-gray-900 dark:to-slate-900">
+      <header className="gradient-header text-white px-3 sm:px-4 py-3 sm:py-4 shadow-2xl sticky top-0 z-50 backdrop-blur-sm">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Button
@@ -735,6 +736,219 @@ export default function CreateNotePage() {
       </header>
 
       <main className="max-w-md mx-auto px-4 py-6 space-y-6">
+        {/* 文本输入区域 */}
+        <Card className="note-card p-4 animate-in slide-in-from-top-2 duration-300">
+          <div className="space-y-4">
+            {!isTodoMode ? (
+              <div className="relative">
+                <textarea
+                  ref={textareaRef}
+                  placeholder="写下你的想法..."
+                  value={content}
+                  onChange={(e) => handleContentChange(e.target.value)}
+                  className="w-full min-h-[200px] p-4 border border-slate-200 dark:border-slate-700 rounded-lg 
+                           bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 
+                           placeholder-slate-400 dark:placeholder-slate-500
+                           focus:outline-none focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-600
+                           resize-none transition-all duration-300"
+                />
+                {content && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsPreviewMode(!isPreviewMode)}
+                    className="absolute top-2 right-2 text-slate-500 hover:text-rose-500 transition-all duration-300"
+                  >
+                    {isPreviewMode ? "编辑" : "预览"}
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium text-slate-700 dark:text-slate-200">清单模式</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={switchToTextMode}
+                    className="text-slate-500 hover:text-rose-500 transition-all duration-300"
+                  >
+                    切换到文本
+                  </Button>
+                </div>
+                <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                  {todoItems.map((item) => (
+                    <div key={item.id} className="flex items-center space-x-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800">
+                      <input
+                        type="checkbox"
+                        checked={item.completed}
+                        onChange={() => toggleTodoItem(item.id)}
+                        className="rounded border-slate-300 text-rose-500 focus:ring-rose-300"
+                      />
+                      <input
+                        type="text"
+                        value={item.text}
+                        onChange={(e) => updateTodoText(item.id, e.target.value)}
+                        className={`flex-1 bg-transparent border-none outline-none text-sm ${
+                          item.completed ? "line-through text-slate-400" : "text-slate-700 dark:text-slate-200"
+                        }`}
+                      />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => indentTodoItem(item.id, "in")}
+                        className="text-slate-400 hover:text-slate-600"
+                      >
+                        →
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => indentTodoItem(item.id, "out")}
+                        className="text-slate-400 hover:text-slate-600"
+                      >
+                        ←
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteTodoItem(item.id)}
+                        className="text-red-400 hover:text-red-600"
+                      >
+                        ×
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex space-x-2">
+                  <Input
+                    placeholder="添加新任务..."
+                    value={newTodoText}
+                    onChange={(e) => setNewTodoText(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addTodoItem()}
+                    className="flex-1"
+                  />
+                  <Button onClick={addTodoItem} size="sm">
+                    添加
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            {/* 模式切换按钮 */}
+            <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
+              <div className="flex space-x-2">
+                <Button
+                  variant={isTodoMode ? "default" : "outline"}
+                  size="sm"
+                  onClick={switchToTodoMode}
+                  className="text-xs transition-all duration-300"
+                >
+                  清单模式
+                </Button>
+                <Button
+                  variant={!isTodoMode ? "default" : "outline"}
+                  size="sm"
+                  onClick={switchToTextMode}
+                  className="text-xs transition-all duration-300"
+                >
+                  文本模式
+                </Button>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowTemplates(!showTemplates)}
+                className="text-slate-500 hover:text-rose-500 transition-all duration-300"
+              >
+                使用模板
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {/* 图片上传和拍照功能 */}
+        <Card className="note-card p-4 animate-in slide-in-from-top-3 duration-400">
+          <h3 className="font-serif font-semibold text-slate-700 dark:text-slate-200 mb-3">图片</h3>
+          <div className="space-y-3">
+            {/* 图片预览 */}
+            {uploadedImage && (
+              <div className="relative">
+                <img
+                  src={uploadedImage}
+                  alt="上传的图片"
+                  className="w-full h-48 object-cover rounded-lg"
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setUploadedImage(null)}
+                  className="absolute top-2 right-2 bg-white/80 hover:bg-white text-red-500 rounded-full p-2"
+                >
+                  ×
+                </Button>
+              </div>
+            )}
+            
+            {/* 上传按钮 */}
+            <div className="flex space-x-2">
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1 transition-all duration-300 hover:scale-105"
+              >
+                📁 上传图片
+              </Button>
+              
+              <input
+                type="file"
+                ref={cameraInputRef}
+                accept="image/*"
+                capture="environment"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => cameraInputRef.current?.click()}
+                className="flex-1 transition-all duration-300 hover:scale-105"
+              >
+                📷 拍照
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {/* 模板选择 */}
+        {showTemplates && (
+          <Card className="note-card p-4 animate-in slide-in-from-top-4 duration-500">
+            <h3 className="font-serif font-semibold text-slate-700 dark:text-slate-200 mb-3">选择模板</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {TEXT_TEMPLATES.map((template) => (
+                <Button
+                  key={template.name}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => insertTemplate(template)}
+                  className="text-xs h-auto p-3 text-left transition-all duration-300 hover:scale-105 hover:shadow-md"
+                >
+                  <div className="text-lg mb-1">{template.icon}</div>
+                  <div>{template.name}</div>
+                </Button>
+              ))}
+            </div>
+          </Card>
+        )}
+
         {/* ... existing voice recording, drawing, image upload, templates sections ... */}
 
         {/* Added time management section */}

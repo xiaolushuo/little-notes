@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { Calendar, Tag, Heart } from "lucide-react"
+import { Calendar, Tag, Heart, Pin } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import { togglePinNote } from "@/lib/storage"
 
 interface Note {
   id: string
@@ -14,6 +15,7 @@ interface Note {
   tags: string[]
   createdAt: Date
   image?: string
+  isPinned?: boolean
 }
 
 interface NoteCardProps {
@@ -22,13 +24,24 @@ interface NoteCardProps {
   isMultiSelect: boolean
   onSelect: () => void
   onLongPress: () => void
+  refreshNotes: () => void
   index?: number
 }
 
-export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPress, index = 0 }: NoteCardProps) {
+export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPress, refreshNotes, index = 0 }: NoteCardProps) {
   const [isPressed, setIsPressed] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
   const router = useRouter()
+
+  const handleTogglePin = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    try {
+      await togglePinNote(note.id)
+      refreshNotes()
+    } catch (error) {
+      console.error("Error toggling pin:", error)
+    }
+  }
 
   // 移动端触摸事件处理
   let pressTimer: NodeJS.Timeout | null = null
@@ -100,8 +113,8 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
 
   return (
     <Card
-      className={`note-card p-3 sm:p-4 transition-all duration-500 hover:shadow-xl hover:-translate-y-2 cursor-pointer group touch-optimized card-touch ${
-        isSelected ? "ring-2 ring-rose-500 shadow-lg" : ""
+      className={`note-card p-4 sm:p-6 cursor-pointer group touch-optimized card-touch ${
+        isSelected ? "ring-2 ring-brand-primary shadow-2xl" : ""
       } ${isPressed ? "scale-95" : ""}`}
       style={{
         animationDelay: `${index * 100}ms`,
@@ -113,35 +126,38 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
       onClick={isMultiSelect ? onSelect : undefined}
     >
       {isMultiSelect && (
-        <div className="mb-2 sm:mb-3 animate-in slide-in-from-top-2 duration-300">
+        <div className="mb-3 sm:mb-4 animate-in slide-in-from-top-2 duration-300">
           <Checkbox checked={isSelected} onChange={onSelect} />
         </div>
       )}
 
       {note.image && (
-        <div className="mb-2 sm:mb-3 rounded-lg overflow-hidden group-hover:shadow-md transition-shadow duration-300">
+        <div className="mb-3 sm:mb-4 rounded-xl overflow-hidden group-hover:shadow-lg transition-all duration-500">
           <img
             src={note.image || "/placeholder.svg"}
             alt="Note attachment"
-            className="w-full h-24 sm:h-32 object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-28 sm:h-36 object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
             decoding="async"
           />
         </div>
       )}
 
-      <p className="text-slate-700 dark:text-slate-200 font-sans leading-relaxed mb-2 sm:mb-3 transition-colors duration-300 text-sm sm:text-base">
+      <p className="text-foreground font-sans leading-relaxed mb-3 sm:mb-4 transition-colors duration-300 text-sm sm:text-base">
         {note.content}
       </p>
 
       {note.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1 sm:gap-2 mb-2 sm:mb-3">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
           {note.tags.map((tag, tagIndex) => (
             <Badge
               key={tag}
               variant="secondary"
-              className="text-xs bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300 
-                         transition-all duration-300 hover:scale-110 hover:bg-rose-200 dark:hover:bg-rose-800/40"
+              className={`badge-modern cursor-pointer ${
+                false 
+                  ? "gradient-primary text-white shadow-lg" 
+                  : "bg-muted/50 dark:bg-muted/20 text-muted-foreground hover:bg-brand-primary/10"
+              }`}
               style={{
                 animationDelay: `${index * 100 + tagIndex * 50}ms`,
               }}
@@ -154,26 +170,47 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
       )}
 
       <div className="flex items-center justify-between">
-        <div className="flex items-center text-xs text-slate-500 dark:text-slate-400 transition-colors duration-300">
+        <div className="flex items-center text-xs text-muted-foreground transition-colors duration-300">
           <Calendar className="h-3 w-3 mr-1" />
           {note.createdAt.toLocaleDateString("zh-CN")}
         </div>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation()
-            setIsLiked(!isLiked)
-          }}
-          className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 p-1 h-6 w-6 sm:h-8 sm:w-8"
-        >
-          <Heart
-            className={`h-3 w-3 sm:h-4 sm:w-4 transition-all duration-300 ${
-              isLiked ? "fill-rose-500 text-rose-500 scale-110" : "text-slate-400 hover:text-rose-500"
+        <div className="flex items-center space-x-1">
+          {/* 置顶按钮 */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleTogglePin}
+            className={`transition-all duration-300 hover:scale-110 p-1 h-7 w-7 sm:h-8 sm:w-8 rounded-lg hover:bg-brand-primary/10 ${
+              note.isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
             }`}
-          />
-        </Button>
+          >
+            <Pin
+              className={`h-3 w-3 sm:h-4 sm:w-4 transition-all duration-300 ${
+                note.isPinned 
+                  ? "fill-brand-primary text-brand-primary scale-110" 
+                  : "text-muted-foreground hover:text-brand-primary"
+              }`}
+            />
+          </Button>
+
+          {/* 点赞按钮 */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation()
+              setIsLiked(!isLiked)
+            }}
+            className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 p-1 h-7 w-7 sm:h-8 sm:w-8 rounded-lg hover:bg-brand-primary/10"
+          >
+            <Heart
+              className={`h-3 w-3 sm:h-4 sm:w-4 transition-all duration-300 ${
+                isLiked ? "fill-brand-primary text-brand-primary scale-110" : "text-muted-foreground hover:text-brand-primary"
+              }`}
+            />
+          </Button>
+        </div>
       </div>
     </Card>
   )
