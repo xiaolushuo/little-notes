@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { saveNote, type Note, type TodoItem } from "@/lib/storage"
 
 const BUILT_IN_TAGS = ["生活", "工作", "学习", "美食", "旅行", "健康", "娱乐", "购物"]
@@ -714,24 +715,28 @@ export default function CreateNotePage() {
             </Button>
             <h1 className="text-lg font-serif font-black">新建小纸条</h1>
           </div>
-          <Button
-            onClick={handleSave}
-            disabled={(!content.trim() && todoItems.length === 0) || isSaving}
-            className="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-lg 
-                       transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:scale-100"
-          >
-            {isSaving ? (
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>保存中...</span>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-1">
-                <Sparkles className="h-4 w-4" />
-                <span>保存</span>
-              </div>
-            )}
-          </Button>
+          <div className="flex items-center space-x-2">
+            {/* 主题切换按钮 */}
+            <ThemeToggle />
+            <Button
+              onClick={handleSave}
+              disabled={(!content.trim() && todoItems.length === 0) || isSaving}
+              className="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-lg 
+                         transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:scale-100"
+            >
+              {isSaving ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>保存中...</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-1">
+                  <Sparkles className="h-4 w-4" />
+                  <span>保存</span>
+                </div>
+              )}
+            </Button>
+          </div>
         </div>
       </header>
 

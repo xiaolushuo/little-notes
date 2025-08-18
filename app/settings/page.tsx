@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowLeft, Save, Settings, Sparkles } from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
 
 export default function SettingsPage() {
@@ -35,10 +36,14 @@ export default function SettingsPage() {
               </div>
               <h1 className="text-2xl font-bold gradient-primary bg-clip-text text-transparent">设置</h1>
             </div>
-            <Button onClick={handleSave} size="sm" className="btn-modern gradient-primary text-white px-4 py-2">
-              <Save className="h-4 w-4 mr-2" />
-              保存
-            </Button>
+            <div className="flex items-center space-x-2">
+              {/* 主题切换按钮 */}
+              <ThemeToggle />
+              <Button onClick={handleSave} size="sm" className="btn-modern gradient-primary text-white px-4 py-2">
+                <Save className="h-4 w-4 mr-2" />
+                保存
+              </Button>
+            </div>
           </div>
 
           {/* 设置选项 */}

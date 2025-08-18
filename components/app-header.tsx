@@ -2,6 +2,7 @@
 
 import { CheckSquare, X, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 
@@ -26,6 +27,9 @@ export function AppHeader({ isMultiSelect, selectedCount, onMultiSelectToggle }:
         </div>
 
         <div className="flex items-center space-x-1 sm:space-x-2">
+          {/* 主题切换按钮 */}
+          <ThemeToggle />
+          
           {isMultiSelect ? (
             <>
               <div className="glass-morphism px-3 py-1 rounded-full">
