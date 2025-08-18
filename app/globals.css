@@ -38,24 +38,24 @@
   --sidebar-ring: oklch(0.708 0 0);
 
   /* Modern color palette for Little Notes app */
-  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-  --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-  --dark-gradient: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --secondary-gradient: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+  --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+  --success-gradient: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+  --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+  --dark-gradient: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   
   /* Glass morphism colors */
-  --glass-bg: rgba(255, 255, 255, 0.25);
-  --glass-border: rgba(255, 255, 255, 0.18);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
   
   /* Brand colors */
-  --brand-primary: #667eea;
-  --brand-secondary: #764ba2;
-  --brand-accent: #f093fb;
-  --brand-light: #f8f9ff;
-  --brand-dark: #1a1c3d;
+  --brand-primary: #6366f1;
+  --brand-secondary: #8b5cf6;
+  --brand-accent: #ec4899;
+  --brand-light: #f8fafc;
+  --brand-dark: #1e293b;
 }
 
 .dark {
@@ -93,11 +93,11 @@
   --sidebar-ring: oklch(0.439 0 0);
 
   /* Dark mode brand colors */
-  --glass-bg: rgba(0, 0, 0, 0.25);
+  --glass-bg: rgba(30, 41, 59, 0.8);
   --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  --brand-light: #1a1c3d;
-  --brand-dark: #f8f9ff;
+  --glass-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
+  --brand-light: #1e293b;
+  --brand-dark: #f8fafc;
 }
 
 @theme inline {
@@ -170,93 +170,93 @@
 @layer utilities {
   /* Modern gradient utilities */
   .gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   }
   
   .gradient-secondary {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
   }
   
   .gradient-accent {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
   }
   
   .gradient-success {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
   }
   
   .gradient-warning {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
   }
   
   .gradient-dark {
-    background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   }
   
   .gradient-destructive {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   }
 
   /* Glass morphism utilities */
   .glass-morphism {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
   }
   
   .dark .glass-morphism {
-    background: rgba(26, 28, 61, 0.6);
+    background: rgba(30, 41, 59, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
   }
   
   .glass-card {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
     border-radius: 1rem;
   }
   
   .dark .glass-card {
-    background: rgba(26, 28, 61, 0.6);
+    background: rgba(30, 41, 59, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
   }
 
   /* Modern header design */
   .gradient-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.2);
   }
 
   /* Enhanced note card design */
   .note-card {
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border-radius: 1rem;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.3s ease;
   }
 
   .dark .note-card {
-    background: rgba(26, 28, 61, 0.6);
+    background: rgba(30, 41, 59, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   .note-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
   }
 
   .dark .note-card:hover {
-    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
   }
 
   /* Modern footer design */
@@ -427,43 +427,43 @@
 
   /* Brand color utilities */
   .text-brand-primary {
-    color: #667eea;
+    color: #6366f1;
   }
   
   .text-brand-secondary {
-    color: #764ba2;
+    color: #8b5cf6;
   }
   
   .text-brand-accent {
-    color: #f093fb;
+    color: #ec4899;
   }
   
   .text-brand-light {
-    color: #f8f9ff;
+    color: #f8fafc;
   }
   
   .text-brand-dark {
-    color: #1a1c3d;
+    color: #1e293b;
   }
   
   .bg-brand-primary {
-    background-color: #667eea;
+    background-color: #6366f1;
   }
   
   .bg-brand-secondary {
-    background-color: #764ba2;
+    background-color: #8b5cf6;
   }
   
   .bg-brand-accent {
-    background-color: #f093fb;
+    background-color: #ec4899;
   }
   
   .bg-brand-light {
-    background-color: #f8f9ff;
+    background-color: #f8fafc;
   }
   
   .bg-brand-dark {
-    background-color: #1a1c3d;
+    background-color: #1e293b;
   }
 
   /* Floating action button styles */
@@ -474,16 +474,16 @@
     width: 3.5rem;
     height: 3.5rem;
     border-radius: 9999px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     color: white;
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     transition: all 0.3s ease;
     z-index: 50;
   }
 
   .fab-modern:hover {
-    transform: scale(1.1);
-    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.6);
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
   }
   
   .fab-modern:active {
@@ -511,28 +511,4 @@
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
-}
-
-/* Modern card touch feedback */
-.card-touch {
-  position: relative;
-  overflow: hidden;
-}
-
-.card-touch::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.card-touch:active::after {
-  width: 300px;
-  height: 300px;
 }

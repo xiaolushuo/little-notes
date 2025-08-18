@@ -995,7 +995,12 @@ export default function CreateNotePage() {
                       variant={selectedExpiration === preset.label ? "default" : "outline"}
                       size="sm"
                       onClick={() => handleExpirationChange(preset.label)}
-                      className="text-xs transition-all duration-300 hover:scale-105"
+                      className="text-xs transition-all duration-300 hover:scale-105 active:scale-95 touch-optimized"
+                      style={{
+                        touchAction: 'manipulation',
+                        WebkitTapHighlightColor: 'transparent',
+                        userSelect: 'none',
+                      }}
                     >
                       {preset.label}
                     </Button>
@@ -1009,6 +1014,12 @@ export default function CreateNotePage() {
                     onChange={(e) => handleCustomExpirationChange(e.target.value)}
                     className="text-sm"
                     min={new Date().toISOString().slice(0, 16)}
+                    enterKeyHint="next"
+                    inputMode="none"
+                    onTouchStart={(e) => {
+                      // 在移动端，点击时显示更好的时间选择器
+                      e.currentTarget.showPicker?.()
+                    }}
                   />
                 )}
               </div>
@@ -1024,7 +1035,12 @@ export default function CreateNotePage() {
                         variant={selectedReminder === preset.label ? "default" : "outline"}
                         size="sm"
                         onClick={() => handleReminderChange(preset.label)}
-                        className="text-xs transition-all duration-300 hover:scale-105"
+                        className="text-xs transition-all duration-300 hover:scale-105 active:scale-95 touch-optimized"
+                        style={{
+                          touchAction: 'manipulation',
+                          WebkitTapHighlightColor: 'transparent',
+                          userSelect: 'none',
+                        }}
                       >
                         {preset.label}
                       </Button>

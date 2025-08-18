@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { Calendar, Tag, Heart, Pin } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Calendar, Tag, Heart, Pin, Clock, AlertCircle } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import { togglePinNote } from "@/lib/storage"
+import { togglePinNote, getNoteTimeStatus, type TimeStatus } from "@/lib/storage"
 
 interface Note {
   id: string
@@ -16,6 +16,7 @@ interface Note {
   createdAt: Date
   image?: string
   isPinned?: boolean
+  expirationDate?: Date
 }
 
 interface NoteCardProps {
@@ -31,7 +32,30 @@ interface NoteCardProps {
 export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPress, refreshNotes, index = 0 }: NoteCardProps) {
   const [isPressed, setIsPressed] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
+  const [timeStatus, setTimeStatus] = useState<TimeStatus | null>(null)
   const router = useRouter()
+
+  // 更新倒计时状态
+  useEffect(() => {
+    const updateTimeStatus = () => {
+      const status = getNoteTimeStatus(note)
+      setTimeStatus(status)
+    }
+
+    updateTimeStatus()
+    
+    // 如果有到期时间，每秒更新一次倒计时
+    let interval: NodeJS.Timeout | null = null
+    if (note.expirationDate) {
+      interval = setInterval(updateTimeStatus, 1000)
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval)
+      }
+    }
+  }, [note.expirationDate])
 
   const handleTogglePin = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -52,7 +76,6 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
   let isScrolling = false
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault()
     setIsPressed(true)
     touchStartY = e.touches[0].clientY
     touchStartX = e.touches[0].clientX
@@ -88,7 +111,6 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
   }
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    e.preventDefault()
     if (pressTimer) {
       clearTimeout(pressTimer)
       pressTimer = null
@@ -126,15 +148,15 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
 
   return (
     <Card
-      className={`note-card p-4 sm:p-6 cursor-pointer group touch-optimized card-touch select-none ${
-        isSelected ? "ring-2 ring-brand-primary shadow-2xl" : ""
-      } ${isPressed ? "scale-95 opacity-90" : ""}`}
+      className={`note-card p-4 sm:p-6 cursor-pointer group touch-optimized select-none ${
+        isSelected ? "ring-2 ring-brand-primary shadow-lg" : ""
+      } ${isPressed ? "scale-98 opacity-90" : ""}`}
       style={{
         animationDelay: `${index * 100}ms`,
         touchAction: 'manipulation',
         WebkitTapHighlightColor: 'transparent',
         userSelect: 'none',
-        transition: 'transform 0.2s ease, opacity 0.2s ease, box-shadow 0.3s ease',
+        transition: 'transform 0.15s ease, opacity 0.15s ease, box-shadow 0.2s ease',
       }}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
@@ -142,6 +164,58 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
       onTouchEnd={handleTouchEnd}
       onClick={isMultiSelect ? onSelect : undefined}
     >
+      {/* 时间状态指示器 */}
+      {timeStatus && (
+        <div className={`mb-3 sm:mb-4 p-3 rounded-lg transition-all duration-300 ${
+          timeStatus.isExpired 
+            ? 'bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800' 
+            : timeStatus.isUrgent 
+              ? 'bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800'
+              : timeStatus.isWarning 
+                ? 'bg-orange-100 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800'
+                : 'bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800'
+        }`}>
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex items-center">
+              <div className="mr-2">
+                {timeStatus.isExpired ? <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" /> : 
+                 timeStatus.isUrgent ? <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400" /> : 
+                 timeStatus.isWarning ? <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" /> : 
+                 <Clock className="h-5 w-5 text-green-600 dark:text-green-400" />}
+              </div>
+              <div>
+                <div className="font-semibold text-sm">
+                  {timeStatus.isExpired ? '已过期' : 
+                   timeStatus.isUrgent ? '即将到期' : 
+                   timeStatus.isWarning ? '需要注意' : '正常进行'}
+                </div>
+              </div>
+            </div>
+            {timeStatus.isCountingDown && (
+              <div className={`text-xs font-mono font-medium px-2 py-1 rounded ${
+                timeStatus.isExpired ? 'bg-red-200 dark:bg-red-800 text-red-900 dark:text-red-200' : 
+                timeStatus.isUrgent ? 'bg-yellow-200 dark:bg-yellow-800 text-yellow-900 dark:text-yellow-200' : 
+                timeStatus.isWarning ? 'bg-orange-200 dark:bg-orange-800 text-orange-900 dark:text-orange-200' : 
+                'bg-green-200 dark:bg-green-800 text-green-900 dark:text-green-200'
+              }`}>
+                {timeStatus.timeLeftText}
+              </div>
+            )}
+          </div>
+          
+          {timeStatus.isCountingDown && (
+            <div className={`text-xs px-2 py-1 rounded ${
+              timeStatus.isExpired ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300' : 
+              timeStatus.isUrgent ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300' : 
+              timeStatus.isWarning ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300' : 
+              'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+            }`}>
+              剩余时间: {timeStatus.detailedText}
+            </div>
+          )}
+        </div>
+      )}
+
       {isMultiSelect && (
         <div className="mb-3 sm:mb-4 animate-in slide-in-from-top-2 duration-300">
           <Checkbox checked={isSelected} onChange={onSelect} />
@@ -186,7 +260,7 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
         </div>
       )}
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div className="flex items-center text-xs text-muted-foreground transition-colors duration-300">
           <Calendar className="h-3 w-3 mr-1" />
           {note.createdAt.toLocaleDateString("zh-CN")}
@@ -198,12 +272,12 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
             variant="ghost"
             size="sm"
             onClick={handleTogglePin}
-            className={`transition-all duration-200 ease-out hover:scale-110 active:scale-95 p-1 h-8 w-8 sm:h-8 sm:w-8 rounded-lg hover:bg-brand-primary/10 ${
+            className={`transition-all duration-150 ease-out hover:scale-105 active:scale-95 p-1 h-8 w-8 sm:h-8 sm:w-8 rounded-lg hover:bg-brand-primary/10 ${
               note.isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
             }`}
             style={{ 
               touchAction: 'manipulation',
-              transition: 'transform 0.2s ease-out, opacity 0.2s ease-out, background-color 0.2s ease-out'
+              transition: 'transform 0.15s ease-out, opacity 0.15s ease-out, background-color 0.15s ease-out'
             }}
           >
             <Pin
@@ -224,10 +298,10 @@ export function NoteCard({ note, isSelected, isMultiSelect, onSelect, onLongPres
               e.stopPropagation()
               setIsLiked(!isLiked)
             }}
-            className="opacity-0 group-hover:opacity-100 transition-all duration-200 ease-out hover:scale-110 active:scale-95 p-1 h-8 w-8 sm:h-8 sm:w-8 rounded-lg hover:bg-brand-primary/10"
+            className="opacity-0 group-hover:opacity-100 transition-all duration-150 ease-out hover:scale-105 active:scale-95 p-1 h-8 w-8 sm:h-8 sm:w-8 rounded-lg hover:bg-brand-primary/10"
             style={{ 
               touchAction: 'manipulation',
-              transition: 'transform 0.2s ease-out, opacity 0.2s ease-out, background-color 0.2s ease-out'
+              transition: 'transform 0.15s ease-out, opacity 0.15s ease-out, background-color 0.15s ease-out'
             }}
           >
             <Heart

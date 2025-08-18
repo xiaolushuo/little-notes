@@ -191,3 +191,136 @@ export const getAllTags = (): string[] => {
   
   return Array.from(tagSet).sort()
 }
+
+// 时间管理相关函数
+export interface TimeStatus {
+  isExpired: boolean
+  isUrgent: boolean
+  isWarning: boolean
+  daysLeft: number
+  hoursLeft: number
+  minutesLeft: number
+  secondsLeft: number
+  timeLeftText: string
+  detailedText: string
+  statusColor: string
+  isCountingDown: boolean
+}
+
+// 获取笔记的时间状态
+export const getNoteTimeStatus = (note: Note): TimeStatus | null => {
+  if (!note.expirationDate) return null
+  
+  const now = new Date()
+  const expiration = new Date(note.expirationDate)
+  const timeDiff = expiration.getTime() - now.getTime()
+  
+  if (timeDiff <= 0) {
+    return {
+      isExpired: true,
+      isUrgent: false,
+      isWarning: false,
+      daysLeft: 0,
+      hoursLeft: 0,
+      minutesLeft: 0,
+      secondsLeft: 0,
+      timeLeftText: '已过期',
+      statusColor: 'text-red-500',
+      detailedText: '已过期',
+      isCountingDown: false
+    }
+  }
+  
+  const daysLeft = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
+  const hoursLeft = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60))
+  const secondsLeft = Math.floor((timeDiff % (1000 * 60)) / 1000)
+  
+  let timeLeftText = ''
+  let detailedText = ''
+  let statusColor = ''
+  let isUrgent = false
+  let isWarning = false
+  
+  // 生成详细倒计时文本
+  if (daysLeft > 0) {
+    if (daysLeft === 1) {
+      detailedText = `${daysLeft}天 ${hoursLeft}时 ${minutesLeft}分 ${secondsLeft}秒`
+      timeLeftText = `${hoursLeft}:${minutesLeft.toString().padStart(2, '0')}:${secondsLeft.toString().padStart(2, '0')}`
+    } else {
+      detailedText = `${daysLeft}天 ${hoursLeft}时 ${minutesLeft}分`
+      timeLeftText = `${daysLeft}天${hoursLeft}时`
+    }
+    statusColor = 'text-green-500'
+    if (daysLeft <= 1) {
+      isUrgent = true
+      statusColor = 'text-red-500'
+    } else if (daysLeft <= 3) {
+      isWarning = true
+      statusColor = 'text-orange-500'
+    }
+  } else if (hoursLeft > 0) {
+    detailedText = `${hoursLeft}时 ${minutesLeft}分 ${secondsLeft}秒`
+    timeLeftText = `${hoursLeft}:${minutesLeft.toString().padStart(2, '0')}:${secondsLeft.toString().padStart(2, '0')}`
+    statusColor = 'text-orange-500'
+    isUrgent = true
+  } else if (minutesLeft > 0) {
+    detailedText = `${minutesLeft}分 ${secondsLeft}秒`
+    timeLeftText = `${minutesLeft}:${secondsLeft.toString().padStart(2, '0')}`
+    statusColor = 'text-red-500'
+    isUrgent = true
+  } else {
+    detailedText = `${secondsLeft}秒`
+    timeLeftText = `${secondsLeft}`
+    statusColor = 'text-red-500'
+    isUrgent = true
+  }
+  
+  return {
+    isExpired: false,
+    isUrgent,
+    isWarning,
+    daysLeft,
+    hoursLeft,
+    minutesLeft,
+    secondsLeft,
+    timeLeftText,
+    detailedText,
+    statusColor,
+    isCountingDown: true
+  }
+}
+
+// 获取即将到期的笔记
+export const getUrgentNotes = (): Note[] => {
+  const notes = getNotes()
+  const urgentNotes: Note[] = []
+  
+  notes.forEach(note => {
+    if (note.expirationDate) {
+      const status = getNoteTimeStatus(note)
+      if (status && (status.isUrgent || status.isExpired)) {
+        urgentNotes.push(note)
+      }
+    }
+  })
+  
+  // 按到期时间排序
+  return urgentNotes.sort((a, b) => {
+    if (!a.expirationDate || !b.expirationDate) return 0
+    return new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime()
+  })
+}
+
+// 按时间排序笔记
+export const sortNotesByTime = (notes: Note[]): Note[] => {
+  return [...notes].sort((a, b) => {
+    // 有到期时间的笔记排在前面
+    if (a.expirationDate && !b.expirationDate) return -1
+    if (!a.expirationDate && b.expirationDate) return 1
+    if (!a.expirationDate && !b.expirationDate) return 0
+    
+    // 都有到期时间，按时间排序
+    return new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime()
+  })
+}
